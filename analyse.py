@@ -33,6 +33,17 @@ def get_total_message() -> int:
     results = cur.fetchall()
     return results[0][0]
 
+def get_event_duration():
+    cur.execute(event_duration_query())
+    t_start, t_end = cur.fetchall()[0]
+    delta = t_end - t_start
+
+    jours = delta.days
+    heures = delta.seconds // 3600
+    minutes = (delta.seconds % 3600) // 60
+
+    return f"{jours} jour, {heures} heure, {minutes} minute"
+
 def get_total_deaths() -> int:
     cur.execute(total_deaths_query())
     results = cur.fetchall()
