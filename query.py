@@ -8,6 +8,11 @@ def total_message_query() -> str:
               FROM messages;
               """
 
+def event_duration_query() -> str:
+    return """SELECT MIN("timestamp"), MAX("timestamp")
+              FROM server;
+              """
+
 def total_deaths_query() -> str:
     return """SELECT count(DISTINCT death) 
               FROM deaths;
