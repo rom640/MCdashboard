@@ -61,6 +61,11 @@ def server_ping_over_time_query() -> pd.DataFrame:
     df.index.name = "time"
     return df
 
+def get_message_over_time() -> pd.DataFrame:
+    cur.execute(messages_over_time_query())
+    df = pd.DataFrame(cur.fetchall(), columns=["message","temps"])
+    return df
+
 def get_info_player(player: str) -> pd.DataFrame:
     cur.execute(player_info_query(player))
     df = pd.DataFrame(cur.fetchall(), columns=["player","kill","death","messages","total session","total playtime (in sec)"])
