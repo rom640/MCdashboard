@@ -28,6 +28,16 @@ def get_total_players() -> int:
     results = cur.fetchall()
     return results[0][0]
 
+def get_total_message() -> int:
+    cur.execute(total_message_query())
+    results = cur.fetchall()
+    return results[0][0]
+
+def get_total_deaths() -> int:
+    cur.execute(total_deaths_query())
+    results = cur.fetchall()
+    return results[0][0]
+
 def get_playercount_over_time() -> pd.DataFrame:
     cur.execute(playercount_over_time_query())
     df = pd.DataFrame(cur.fetchall(), columns=["nombre de joueurs"])
