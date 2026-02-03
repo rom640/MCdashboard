@@ -3,6 +3,11 @@ def total_players_query() -> str:
               FROM players;
               """
 
+def total_message_query() -> str:
+    return """SELECT COUNT(DISTINCT messages)
+              FROM messages;
+              """
+
 def total_deaths_query() -> str:
     return """SELECT count(DISTINCT death) 
               FROM deaths;
