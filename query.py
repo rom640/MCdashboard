@@ -64,6 +64,11 @@ def server_ping_over_time_query() -> str:
             ORDER BY "timestamp";
             """
 
+def messages_over_time_query() -> str:
+    return """SELECT messages, "timestamp" 
+              FROM server 
+              ORDER BY "timestamp";
+              """
 
 
 def player_info_query(player:str) -> str :
