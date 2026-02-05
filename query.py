@@ -48,6 +48,22 @@ def top_message_senders_query(limit:int=10)->str:
                LIMIT {limit};
                """
 
+def death_distribution_query() -> str:
+    return f"""SELECT type,COUNT(type)
+               FROM death 
+               GROUP BY type
+               ORDER BY COUNT(type) DESC
+               LIMIT 7; 
+               """
+
+
+def top_chatters_query() -> str:
+    return """SELECT player,messages
+              FROM players
+              ORDER BY messages DESC
+              LIMIT 10;
+              """
+
 def playercount_over_time_query() -> str:
     return """SELECT playercount 
               FROM server 
