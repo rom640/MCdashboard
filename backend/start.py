@@ -2,28 +2,29 @@ import subprocess, psycopg2, os, time
 
 
 #config
-CONTAINER_NAME = "pg_3b3france"
+CONTAINER_NAME = "container_3b3france"
 DB_NAME = "3b3france"
 DB_USER = "postgres"
 DB_PASSWORD = "pw"
-DUMP_FILE = os.path.join("3b3france_dump.psql")
+DUMP_FILE_NAME = "3b3france_dump.psql"
 
+
+DUMP_FILE = os.path.join(os.path.dirname(__file__), '..', 'database', f'{DUMP_FILE_NAME}')
 
 def run(cmd, **kwargs):
-    """exécute une commande shell"""
     return subprocess.run(cmd, check=True, **kwargs)
 
-#démarrage du conteneur docker et restauration de la db
+#start the container and psycopg2
 def start_db():
     """lance psycopg2 et return le port"""
     print("démarrage du conteneur postgresql...")
 
-    #supprimer l'ancien conteneur s'il existe
+    #sup last container if exist
     subprocess.run(["docker", "rm", "-f", CONTAINER_NAME],
                    stdout=subprocess.DEVNULL,
                    stderr=subprocess.DEVNULL)
 
-    #lancer PostgreSQL
+    #start postgresql
     run([
         "docker", "run", "--name", CONTAINER_NAME,
         "-e", f"POSTGRES_PASSWORD={DB_PASSWORD}",
@@ -35,14 +36,14 @@ def start_db():
     print("attente 5 secondes que postgresql démarre...")
     time.sleep(5)
 
-    #récupérer le port
+    #récup port
     out = subprocess.check_output(
         ["docker", "port", CONTAINER_NAME, "5432/tcp"]
     ).decode().strip()
     port = out.split(":")[-1]
     print(f"postgresql prêt sur le port {port}")
 
-    #restaurer le dump
+    #start the dumb
     print("restauration du dump...")
     with open(DUMP_FILE, "rb") as f:
         run([
@@ -53,7 +54,7 @@ def start_db():
     print("db restaurée avec succès") #youpi
     return port
 
-# connexion PostgreSQL
+#connecting postgresql
 def get_connection(port):
     """retourn une connexion psycopg2"""
     try:
@@ -68,5 +69,6 @@ def get_connection(port):
     except Exception as e:
         print("erreur de connexion postgresql :", e)  #et là c'est le drame
 
+#for testing
 if __name__ == "__main__":
     start_db()

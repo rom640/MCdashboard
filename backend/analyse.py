@@ -1,17 +1,10 @@
-from start import get_connection, start_db
-from query import *
-from datetime import datetime
-import pandas as pd  #c'est dans tout les tuto ce 'pd'
+from backend.start import get_connection, start_db
+from backend.query import *
+import pandas as pd     #c'est vraiment partout ce 'as pd'
 
 port = start_db()
 conn = get_connection(port)
 cur = conn.cursor()
-
-def delta_temps(timestamp1: str, timestamp2: str) -> float:
-    """retourne la durée entre les deux timestamps en secondes:float"""
-    format_timestamp = "%Y-%m-%d %H:%M:%S.%f"      #le nom "format" est déjà pris par un autre truc
-    delta = datetime.strptime(timestamp2, format_timestamp) - datetime.strptime(timestamp1, format_timestamp)
-    return delta.total_seconds()
 
 def get_average_deaths() -> int:
     cur.execute(average_deaths_query())
@@ -44,21 +37,38 @@ def get_event_duration():
 
     return f"{jours} jour, {heures} heure, {minutes} minute"
 
+def get_total_kills_by_player() -> int:
+    pass
+
+def get_total_kills_by_monsters() -> int:
+    pass
+
+def get_total_kills_by_environment() -> int:
+    pass
+
 def get_total_deaths() -> int:
     cur.execute(total_deaths_query())
     results = cur.fetchall()
     return results[0][0]
 
-def get_playercount_over_time() -> pd.DataFrame:
-    cur.execute(playercount_over_time_query())
-    df = pd.DataFrame(cur.fetchall(), columns=["nombre de joueurs"])
-    df.index.name = "temps"
+def get_death_distribution(limit:int=7) -> pd.DataFrame:
+    cur.execute(death_distribution_query(limit))
+    df = pd.DataFrame(cur.fetchall(), columns=["type", "nombre"])
     return df
 
-def server_ping_over_time_query() -> pd.DataFrame:
+def get_top_chatters(limit:int=10) -> pd.DataFrame:
+    cur.execute(top_chatters_query(limit))
+    df = pd.DataFrame(cur.fetchall(), columns=["joueur","messages"])
+    return df
+
+def get_playercount_over_time() -> pd.DataFrame:
     cur.execute(playercount_over_time_query())
-    df = pd.DataFrame(cur.fetchall(), columns=["ping"])
-    df.index.name = "time"
+    df = pd.DataFrame(cur.fetchall(), columns=["nombre de joueurs","temps"])
+    return df
+
+def get_ping_over_time() -> pd.DataFrame:
+    cur.execute(ping_over_time_query())
+    df = pd.DataFrame(cur.fetchall(), columns=["ping","temps"])
     return df
 
 def get_message_over_time() -> pd.DataFrame:
@@ -69,7 +79,6 @@ def get_message_over_time() -> pd.DataFrame:
 def get_info_player(player: str) -> pd.DataFrame:
     cur.execute(player_info_query(player))
     df = pd.DataFrame(cur.fetchall(), columns=["player","kill","death","messages","total session","total playtime (in sec)"])
-    df.index.name = "id"
     return df
 
 def get_list_player_query() -> list:
@@ -77,16 +86,11 @@ def get_list_player_query() -> list:
     results = [t[0] for t in cur.fetchall()]
     return results
 
-
-
-
-
-
-
-
-
-
-
+def get_last_chat_lines():
+    cur.execute(last_chat_lines_query())
+    df = pd.DataFrame(cur.fetchall(), columns=["player", "message", "timestamp"])
+    return df
+print(get_last_chat_lines())
 
 
 
@@ -98,9 +102,7 @@ def proof_update(table: str, primary_key: int, **columns) -> None:
         print("erreur")
     else:
         cur.execute(proof_update_query(table, primary_key, **columns))
-        conn.commit()    #pour apliquer le query sur la db
-        cur.close()
-        conn.close()
+        conn.commit()
 
 def proof_insert(table: str, **columns) -> None:
     if proof_insert_query(table, **columns) is None:
@@ -108,11 +110,7 @@ def proof_insert(table: str, **columns) -> None:
     else:
         cur.execute(proof_update_query(table,  **columns))
         conn.commit()
-        cur.close()
-        conn.close()
 
 def proof_delete(table: str, primary_key: int) -> None:
     cur.execute(proof_delete_query(table, primary_key))
     conn.commit()
-    cur.close()
-    conn.close()

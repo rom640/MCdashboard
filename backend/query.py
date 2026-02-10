@@ -13,18 +13,15 @@ def event_duration_query() -> str:
               FROM server;
               """
 
+def down_time_query() -> str:
+    pass
+
 def total_deaths_query() -> str:
-    return """SELECT count(DISTINCT death) 
-              FROM deaths;
+    return """SELECT count(DISTINCT primary_key) 
+              FROM death;
               """
 
-def total_kills_query() -> str:
-    pass
-
-def a():
-    pass
-
-def b():
+def a_query() -> str:
     pass
 
 def average_deaths_query() -> str:
@@ -48,34 +45,29 @@ def top_message_senders_query(limit:int=10)->str:
                LIMIT {limit};
                """
 
-def death_distribution_query() -> str:
-    return f"""SELECT type,COUNT(type)
-               FROM death 
+def death_distribution_query(limit:int=7) -> str:
+    return f"""SELECT type, COUNT(type)
+               FROM death  
                GROUP BY type
                ORDER BY COUNT(type) DESC
-               LIMIT 7; 
+               LIMIT {limit}; 
                """
 
-
-def top_chatters_query() -> str:
-    return """SELECT player,messages
-              FROM players
-              ORDER BY messages DESC
-              LIMIT 10;
-              """
+def top_chatters_query(limit:int=10) -> str:
+    return f"""SELECT player,messages
+               FROM players
+               ORDER BY messages DESC
+               LIMIT {limit};
+               """
 
 def playercount_over_time_query() -> str:
-    return """SELECT playercount 
+    return """SELECT playercount, "timestamp" 
               FROM server 
               ORDER BY "timestamp";   
               """
 
-def total_messages_over_time_query() -> str:
-    return f"""
-               """
-
-def server_ping_over_time_query() -> str:
-    return """SELECT ping 
+def ping_over_time_query() -> str:
+    return """SELECT ping, "timestamp" 
             FROM server 
             ORDER BY "timestamp";
             """
@@ -94,6 +86,11 @@ def player_info_query(player:str) -> str :
                ORDER BY totalplaytime DESC;
                """
 
+def last_chat_lines_query() -> str:
+    return f"""SELECT timestamp, player, message
+               FROM messages
+               ORDER BY timestamp DESC;
+               """
 
 
 
@@ -103,7 +100,7 @@ def player_info_query(player:str) -> str :
 
 
 def proof_update_query(table: str, primary_key: int, **columns) -> str | None:
-    """return None si il a pas d'update"""
+    """return None si il a pas d'update a faire"""
     # **columns fais un dict
     if columns is None:
         print("aucune columns a update")

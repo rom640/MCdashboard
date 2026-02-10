@@ -1,11 +1,7 @@
-import os
+import subprocess
 
 def main():
-    os.system("streamlit run dashboard.py")
-
-
-
-
+    subprocess.run("streamlit run dashboard.py", shell=True)
 
 
 
