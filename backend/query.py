@@ -8,21 +8,23 @@ def total_message_query() -> str:
               FROM messages;
               """
 
-def event_duration_query() -> str:
-    return """SELECT MIN("timestamp"), MAX("timestamp")
-              FROM server;
-              """
-
-def down_time_query() -> str:
-    pass
+def server_status_query() -> str:
+    return """
+        SELECT ping, "timestamp"
+        FROM server
+        ORDER BY "timestamp" ASC;
+    """
 
 def total_deaths_query() -> str:
     return """SELECT count(DISTINCT primary_key) 
               FROM death;
               """
 
-def a_query() -> str:
-    pass
+def deaths_by_type_query() -> str:
+    return """SELECT killer   
+              FROM death;
+              """
+
 
 def average_deaths_query() -> str:
     """avec sous-quary; somme de tout les mort(*1.0 pour int -> float) diviser pas le nombre de joueurs"""

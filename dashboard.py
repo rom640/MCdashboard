@@ -19,50 +19,52 @@ if "page" not in st.session_state:
 
 page = st.sidebar.selectbox(
     "page",
-    ["dashboard", "bot"],
-    index=["dashboard", "bot"].index(st.session_state.page))
+    ["dashboard", "player", "bot"],
+    index=["dashboard", "player", "bot"].index(st.session_state.page))
 
 st.session_state.page = page
+
+#fais un grand espace
+for _ in range(33):
+    st.sidebar.write("")
 
 theme = st.sidebar.selectbox(
     "theme",
     ["Dark", "Light"])
 if theme == "Light":
-    st.sidebar.selectbox(
-        "santé mental",
-        ["bas fond de l'humanité", "3 heure au Goulag de Maucorps", "moi a 3h du mat sur ce projet", "asile psychatrique", "dépretion + autisme + PTSD + TDAH + lucie"])
+    st.sidebar.write("c'est non ")
 
 #refresh every 10 sec if change
 st_autorefresh(interval=10_000, key="datarefresh")
 
 
-########################################""
+########################################
 
-# page dashboard
+#page dashboard du serv
 if page == "dashboard":
 
     st.title(f"Dashboard {DB_NAME}")
 
-    # int
+    #int
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric("Nombre de joueurs", analyse.get_total_players())
+        st.metric("Nombre de joueurs unique", analyse.get_total_players())
     with col2:
         st.metric("Nombre de messages", analyse.get_total_message())
     with col3:
-        st.metric("Durée de l'event", analyse.get_event_duration())
+        st.metric("uptime", analyse.get_uptime())
 
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
         st.metric("Nombre de morts", analyse.get_total_deaths())
     with col2:
-        st.metric("Kills par joueur",2556)
+        st.metric("Kills par joueur", analyse.get_deaths_by_type()[0])
     with col3:
-        st.metric("Kills par monstres",430)
+        st.metric("Kills par monstres",analyse.get_deaths_by_type()[1])
     with col4:
-        st.metric("Kills par environnement", 1604)
+        st.metric("Kills par environnement", analyse.get_deaths_by_type()[2])
     with col5:
         st.metric("Moyenne de morts", analyse.get_average_deaths())
 
@@ -70,7 +72,7 @@ if page == "dashboard":
 
     col1, col2 = st.columns(2)
 
-    # pie chart
+    #pie chart
     with col1:
         palette = ["#0F57C2", "#2171b5", "#4292c6", "#6baed6", "#9ecae1", "#c6dbef", "#EBF2F9"]
 
@@ -187,6 +189,9 @@ if page == "dashboard":
 
     st.divider() ###################################################################################
 
-# autre page
-elif page == "bot":
+elif page == "plater":
     pass
+
+#page pour le bot
+elif page == "bot":
+    st.title("comming soon ")

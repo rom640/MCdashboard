@@ -1,6 +1,7 @@
 from backend.start import get_connection, start_db
 from backend.query import *
-import pandas as pd     #c'est vraiment partout ce 'as pd'
+import pandas as pd
+from datetime import timedelta
 
 port = start_db()
 conn = get_connection(port)
@@ -26,30 +27,51 @@ def get_total_message() -> int:
     results = cur.fetchall()
     return results[0][0]
 
-def get_event_duration():
-    cur.execute(event_duration_query())
-    t_start, t_end = cur.fetchall()[0]
-    delta = t_end - t_start
+def get_uptime():
+    cur.execute(server_status_query())
+    rows = cur.fetchall()
 
-    jours = delta.days
-    heures = delta.seconds // 3600
-    minutes = (delta.seconds % 3600) // 60
+    total_uptime = timedelta()
 
-    return f"{jours} jour, {heures} heure, {minutes} minute"
+    for i in range(len(rows) - 1):
+        ping, current_time = rows[i]
+        _, next_time = rows[i + 1]   #take next row
 
-def get_total_kills_by_player() -> int:
-    pass
+        #if server was up during this interval
+        if ping >= 0:       #ping = -1 -> down time
+            total_uptime += (next_time - current_time)
 
-def get_total_kills_by_monsters() -> int:
-    pass
+    jours = total_uptime.days
+    heures = total_uptime.seconds // 3600
+    minutes = (total_uptime.seconds % 3600) // 60
 
-def get_total_kills_by_environment() -> int:
-    pass
+    return f"{jours} days, {heures} hours, {minutes} minutes"
 
 def get_total_deaths() -> int:
     cur.execute(total_deaths_query())
     results = cur.fetchall()
     return results[0][0]
+
+def get_deaths_by_type() -> tuple:
+    """return tuple with (player, mob, environment)"""
+    cur.execute(deaths_by_type_query())
+    df = pd.DataFrame(cur.fetchall(), columns=["killer"])
+
+    player, mob, environment = 0, 0, 0
+
+    for killer in df["killer"]:
+        killer = str(killer).strip()      #-> str
+
+        if killer == "":
+            environment += 1
+
+        elif killer.endswith("(mob)"):    #if "(mob)" at the end
+            mob += 1
+
+        else:
+            player += 1
+
+    return player, mob, environment
 
 def get_death_distribution(limit:int=7) -> pd.DataFrame:
     cur.execute(death_distribution_query(limit))

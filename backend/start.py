@@ -1,7 +1,7 @@
 import subprocess, psycopg2, os, time
 
 
-#config
+#docker and database config
 CONTAINER_NAME = "container_3b3france"
 DB_NAME = "3b3france"
 DB_USER = "postgres"
@@ -12,14 +12,15 @@ DUMP_FILE_NAME = "3b3france_dump.psql"
 DUMP_FILE = os.path.join(os.path.dirname(__file__), '..', 'database', f'{DUMP_FILE_NAME}')
 
 def run(cmd, **kwargs):
+    """run a command in shell"""
     return subprocess.run(cmd, check=True, **kwargs)
 
 #start the container and psycopg2
 def start_db():
-    """lance psycopg2 et return le port"""
+    """start a new postgresql docker container, restore the dumb and return the host port"""
     print("démarrage du conteneur postgresql...")
 
-    #sup last container if exist
+    #remove last container if already exists
     subprocess.run(["docker", "rm", "-f", CONTAINER_NAME],
                    stdout=subprocess.DEVNULL,
                    stderr=subprocess.DEVNULL)
@@ -29,14 +30,14 @@ def start_db():
         "docker", "run", "--name", CONTAINER_NAME,
         "-e", f"POSTGRES_PASSWORD={DB_PASSWORD}",
         "-e", f"POSTGRES_DB={DB_NAME}",
-        "-p", "0:5432",  # port aléatoire côté hôte
+        "-p", "0:5432",                             #random host port
         "-d", "postgres:16"
     ])
 
     print("attente 5 secondes que postgresql démarre...")
     time.sleep(5)
 
-    #récup port
+    #retrieve host port
     out = subprocess.check_output(
         ["docker", "port", CONTAINER_NAME, "5432/tcp"]
     ).decode().strip()
@@ -45,6 +46,10 @@ def start_db():
 
     #start the dumb
     print("restauration du dump...")
+
+    if not os.path.exists(DUMP_FILE):
+        raise FileNotFoundError(f"Dump introuvable : {DUMP_FILE}")
+
     with open(DUMP_FILE, "rb") as f:
         run([
             "docker", "exec", "-i", CONTAINER_NAME,
@@ -56,7 +61,7 @@ def start_db():
 
 #connecting postgresql
 def get_connection(port):
-    """retourn une connexion psycopg2"""
+    """create and return a psycopg connection"""
     try:
         conn = psycopg2.connect(
             dbname=DB_NAME,
