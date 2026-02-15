@@ -112,10 +112,7 @@ def get_last_chat_lines():
     cur.execute(last_chat_lines_query())
     df = pd.DataFrame(cur.fetchall(), columns=["player", "message", "timestamp"])
     return df
-print(get_last_chat_lines())
-
-
-
+#print(get_last_chat_lines())
 
 
 

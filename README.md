@@ -16,8 +16,8 @@ arborescence
 
 projet_nsi/
 │
-├── requirements.txt              //dépendance
-├── .gitignore                    //
+├── requirements.txt              // dépendance
+├── .gitignore                    // fichier ignorer par git
 │
 ├── database/
 │    └──3b3france_dump.psql        // dump de la base PostgreSQL
@@ -28,10 +28,23 @@ projet_nsi/
 │    ├──query.py                  // les query sous form de fonction pour faire redecendre les parametres
 │    └──analyse.py                // execute des requêtes et return des datafram ou des int 
 │
+├── misc/                         // autre ressource
+│
 ├── dashboard.py                  // interface web
-├── main.py                       // point d’entrée du projet
+├── main.py
 │
 └── README.md                     // this files
+```
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Dashboard
+    participant DB
+    User->>Dashboard: ouvre le dashboard
+    Dashboard->>DB: exécute requêtes SQL
+    DB-->>Dashboard: renvoie résultats
+    Dashboard->>User: affiche statistiques
 ```
 
 #### choix des techno
@@ -166,8 +179,7 @@ docker
 ```pip install -r requirements.txt``` 
 5. lancer le projet  
 ```streamlit run dashboard.py```
-
-
+ou ```.venv/bin/python -m streamlit run dashboard.py```
 
 
 
@@ -252,21 +264,11 @@ pour héberger le bot et le projet pour utiliser le dashboard en temps réel
 → nouvelle page pour info sur les player spécifique
 → créeation du repo github
 
--------------------------------------- 
-
-
-
-kill streak
-Ratio Kill / Death
-candle chart des nouveau par jours
-nouvelle page pour d'autre info comme parametre du bot
-joueur co actuelement et chat (dynamique)
-
---------------------------------------   
+--------------------------------------
 ```
 
 ## 5 Conclusion
-Ce premier projet m’a appris beaucoup de choses, notamment toute la partie autour du développement : utilisation d’un IDE, gestion d’un environnement virtuel, organisation d’un dépôt github et travail avec docker.
+Ce premier projet m’a appris beaucoup de choses, notamment toute la partie autour du développement : utilisation d’un IDE, gestion d’un environnement virtuel, organisation d’un dépôt github, introduction a git et docker.
 
 J’ai également découvert la partie conception d’un projet, comme le choix des bibliothèques spécifique, l'architecture.
 
@@ -293,6 +295,7 @@ Le développement du projet s’est appuyé sur plusieurs documentations techniq
 • [guide pandas et dataframe](https://www.youtube.com/watch?v=zZkNOdBWgFQ)  
 • [ui python avec Matplotlib et Tkinter ](https://www.youtube.com/watch?v=8exB6Ly3nx0) // initialement avant l'interface web  
 • [streamlit](https://docs.streamlit.io/get-started/fundamentals/advanced-concepts)  
+• [guide streamlit](https://www.youtube.com/watch?v=D0D4Pa22iG0)  
 • [venv](https://docs.python.org/fr/3/tutorial/venv.html)  
 • [import](https://docs.python.org/fr/3/reference/import.html)  
 • [*args and **kwargs](https://www.w3schools.com/python/python_args_kwargs.asp)  
@@ -310,18 +313,4 @@ Le développement du projet s’est appuyé sur plusieurs documentations techniq
 • [palette de couleur](https://htmlcolorcodes.com/fr/)  
 • [inspiration](https://grafana.falling-from.space/public-dashboards/7ac85671fc054b158c995589cd2b577c)
 • [bot de sbn](https://codeberg.org/FRAnarchyDev/3b3bot)  
-• [utile en ces temps dure](https://downloadmoreram.com/)  
-
-
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Dashboard
-    participant DB
-    User->>Dashboard: ouvre le dashboard
-    Dashboard->>DB: exécute requêtes SQL
-    DB-->>Dashboard: renvoie résultats
-    Dashboard->>User: affiche statistiques
-
-```
+• [utile en ces temps dure](https://downloadmoreram.com/)

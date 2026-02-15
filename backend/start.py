@@ -15,15 +15,40 @@ def run(cmd, **kwargs):
     """run a command in shell"""
     return subprocess.run(cmd, check=True, **kwargs)
 
+def remove_or_rename_container(name):
+    """remoov container if can, elif rename it"""
+    try:
+        # Vérifie si le conteneur existe
+        existing = subprocess.run(
+            ["docker", "ps", "-a", "-q", "-f", f"name={name}"],
+            capture_output=True, text=True, check=True
+        ).stdout.strip()
+
+        if existing:
+            #try removing the container
+            try:
+                print(f"removing existing container '{name}'...")
+                run(["docker", "rm", "-f", name])
+            except subprocess.CalledProcessError:
+                #except renam it
+                new_name = f"{name}_old_{int(time.time())}"
+                print(f"can not remove '{name}', rename it to '{new_name}'...")
+                run(["docker", "rename", name, new_name])
+    except subprocess.CalledProcessError as e:
+        print(f"warning: could not check existing containers: {e}")
+
 #start the container and psycopg2
 def start_db():
     """start a new postgresql docker container, restore the dumb and return the host port"""
     print("démarrage du conteneur postgresql...")
 
     #remove last container if already exists
-    subprocess.run(["docker", "rm", "-f", CONTAINER_NAME],
-                   stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
+    # Supprime ou renomme le conteneur existant
+    remove_or_rename_container(CONTAINER_NAME)
+
+    # Vérifie que le dump existe
+    if not os.path.exists(DUMP_FILE):
+        raise FileNotFoundError(f"Dump introuvable : {DUMP_FILE}")
 
     #start postgresql
     run([

@@ -13,7 +13,7 @@ st.set_page_config(page_title="dashboard",
 if st.sidebar.button(label="refresh", key=1):
     st.rerun()
 
-# pages
+#pages
 if "page" not in st.session_state:
     st.session_state.page = "dashboard"
 
@@ -24,18 +24,23 @@ page = st.sidebar.selectbox(
 
 st.session_state.page = page
 
-#fais un grand espace
+players = analyse.get_list_player_query()
+
+if page == "player":
+    selected_player = st.sidebar.selectbox("Choisis un joueur :", players)
+
+#grand espace
 for _ in range(33):
     st.sidebar.write("")
 
 theme = st.sidebar.selectbox(
     "theme",
-    ["Dark", "Light"])
-if theme == "Light":
-    st.sidebar.write("c'est non ")
+    ["dark", "light"])
+if theme == "light":
+    st.sidebar.write("c'est non")
 
-#refresh every 10 sec if change
-st_autorefresh(interval=10_000, key="datarefresh")
+#refresh every minute if change
+st_autorefresh(interval=60_000, key="datarefresh")
 
 
 ########################################
@@ -45,7 +50,6 @@ if page == "dashboard":
 
     st.title(f"Dashboard {DB_NAME}")
 
-    #int
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -115,45 +119,15 @@ if page == "dashboard":
 
     # top_chatters
     with col2:
-        st.subheader("plus gros parleur")
+        st.subheader("plus gros chateur")
         df = analyse.get_top_chatters()
         st.dataframe(df, hide_index=True, width="stretch")
 
     st.divider()  ##################################################################################
-    #chat minecraft
 
-    import base64
+    #future chat minecraft
 
-
-    def load_font_base64(path):
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-
-
-    font_base64 = load_font_base64("misc/minecraft_font.woff2")
-
-    st.markdown(f"""
-    <style>
-    @font-face {{
-        font-family: 'Minecraft';
-        src: url(data:misc/minecraft_font.woff2;base64,{font_base64}) format('woff2');
-    }}
-
-    .minecraft-chat {{
-        font-family: 'Minecraft', monospace;
-        background-color: #1E1E1E;
-        color: #E0E0E0;
-        padding: 12px;
-        border-radius: 6px;
-        height: 400px;
-        overflow-y: auto;
-        white-space: pre-wrap;
-        font-size: 16px;
-    }}
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown('<div class="minecraft-chat">[12:00] <Apollo> Test police Minecraft</div>', unsafe_allow_html=True)
+    #futur candle chart des nouveau par jours
 
     st.divider() ###################################################################################
 
@@ -187,11 +161,30 @@ if page == "dashboard":
     st.plotly_chart(heartbeat_message, width='stretch')
     st.plotly_chart(heartbeat_ping, width='stretch')
 
-    st.divider() ###################################################################################
 
-elif page == "plater":
-    pass
+
+
+elif page == "player":
+    st.title(selected_player)
+
+    info_player = analyse.get_info_player(selected_player)
+
+    col1, col2, col3 = st.columns(3)
+    col4, col5, col6 = st.columns(3)
+
+    col1.metric("Kills", info_player.at[0, "kill"])
+    col2.metric("Deaths", info_player.at[0, "death"])
+    col3.metric("Messages", info_player.at[0, "messages"])
+    col4.metric("Total Sessions", info_player.at[0, "total session"])
+    col5.metric("Total Playtime (s)", info_player.at[0, "total playtime (in sec)"])
+    col6.metric("Total Playtime (h)", round(info_player.at[0, "total playtime (in sec)"] / 3600, 2))
+
+
+#futur kill streakv et Ratio Kill / Death
+#futur graphique pour d'autre info
+
+
 
 #page pour le bot
 elif page == "bot":
-    st.title("comming soon ")
+    st.title("comming not soon ")
